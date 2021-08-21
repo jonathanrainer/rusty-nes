@@ -1,0 +1,15 @@
+name: rusty-nes
+author: Jonathan R. <jonathan@jonathan-rainer.com>
+about: A tool to emulate the NES (Nintendo Entertainment System) written in pure Rust, for speed!
+args:
+  - SOURCE_MODE:
+      help: "What mode should the emulator run in?"
+      index: 1
+      possible_values:
+        - "string"
+        - "file"
+      required: true
+  - SOURCE:
+      help: "The source code that should be run"
+      required: true
+      index: 2
