@@ -5,6 +5,12 @@ pub struct Memory {
     raw: Vec<u8>,
 }
 
+impl Memory {
+    pub fn read(&self, address: u16) -> u8 {
+        self.raw[usize::from(address / 4)]
+    }
+}
+
 pub struct MemoryInitialiser {}
 
 impl MemoryInitialiser {
@@ -55,8 +61,7 @@ mod tests {
     #[should_panic]
     #[case::odd_length_valid_characters_prior("DEADB", vec ! [])]
     fn test_memory_initialise_string(#[case] input: &str, #[case] output: Vec<u8>) {
-        let mi = MemoryInitialiser::new();
-        let actual_mem = mi.initialise_from_string(input);
+        let actual_mem = MemoryInitialiser::initialise_from_string(input);
         assert_eq!(actual_mem.raw, output)
     }
 
