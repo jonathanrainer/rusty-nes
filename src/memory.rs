@@ -9,25 +9,20 @@ impl Memory {
     pub fn read(&self, address: u16) -> u8 {
         self.raw[usize::from(address / 4)]
     }
-}
 
-pub struct MemoryInitialiser {}
-
-impl MemoryInitialiser {
-    pub fn new() -> MemoryInitialiser {
-        MemoryInitialiser {}
+    pub fn new() -> Memory {
+        Memory { raw: vec![] }
     }
 
-    pub fn initialise_from_text_file(&self, filename: &Path) -> Memory {
+    pub fn new_from_text_file(filename: &Path) -> Memory {
         let contents = match fs::read_to_string(filename) {
             Ok(contents) => contents,
             Err(err) => panic!("Could not open source program file: {:?}", err)
         };
-        MemoryInitialiser::initialise_from_string(&contents)
+        Memory::new_from_string(&contents)
     }
 
-    pub fn initialise_from_string(program: &str) -> Memory {
-        // Initialise the vector with the contents of said file
+    pub fn new_from_string(program: &str) -> Memory {
         let raw_memory = program.replace("\n", " ").replace(" ", "");
         // Decode text in hex
         let raw_memory = match hex::decode(raw_memory) {
@@ -35,10 +30,6 @@ impl MemoryInitialiser {
             Err(err) => panic!("Could not parse file into memory: {:?}", err)
         };
         Memory { raw: raw_memory }
-    }
-
-    pub fn initialise_empty() -> Memory {
-        Memory { raw: vec![] }
     }
 }
 
@@ -48,7 +39,7 @@ mod tests {
 
     use rstest::rstest;
 
-    use crate::memory::MemoryInitialiser;
+    use crate::memory::Memory;
 
     #[rstest]
     #[case::empty_string("", vec ! [])]
@@ -61,7 +52,7 @@ mod tests {
     #[should_panic]
     #[case::odd_length_valid_characters_prior("DEADB", vec ! [])]
     fn test_memory_initialise_string(#[case] input: &str, #[case] output: Vec<u8>) {
-        let actual_mem = MemoryInitialiser::initialise_from_string(input);
+        let actual_mem = Memory::new_from_string(input);
         assert_eq!(actual_mem.raw, output)
     }
 
@@ -72,11 +63,10 @@ mod tests {
     #[should_panic]
     #[case::nonexistent_file("i_dont_exist.txt", vec ! [])]
     fn test_memory_initialise_file_exists(#[case] filename: &str, #[case] output: Vec<u8>) {
-        let mi = MemoryInitialiser::new();
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        path.push("resources/test");
+        path.push("tests/resources");
         path.push(filename);
-        let actual_mem = mi.initialise_from_text_file(path.as_path());
+        let actual_mem = Memory::new_from_text_file(path.as_path());
         assert_eq!(actual_mem.raw, output)
     }
 }

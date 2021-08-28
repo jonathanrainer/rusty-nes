@@ -5,7 +5,7 @@ use log4rs;
 use log::info;
 
 use crate::cpu::Processor;
-use crate::memory::{Memory, MemoryInitialiser};
+use rusty_nes::memory::Memory;
 
 mod cpu;
 mod memory;
@@ -44,13 +44,13 @@ fn initialise_memory(source_mode: &str, source: &str) -> Memory {
     let mem = match source_mode {
         "string" => {
             info!("Running program from input string...");
-            MemoryInitialiser::initialise_from_string(source)
+            Memory::new_from_string(source)
         }
         "file" => {
             let mut input_file = PathBuf::new();
             input_file.push(source);
             info!("Running program located: {}", input_file.as_path().display());
-            MemoryInitialiser::new().initialise_from_text_file(input_file.as_path())
+            Memory::new_from_text_file(input_file.as_path())
         }
         _ => unreachable!()
     };
